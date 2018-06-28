@@ -6,17 +6,17 @@ class Installer {
 
     /**
 	 * PHP Extensions and their expected state
-	 * (enabled, disabled) in order for this 
+	 * (enabled, disabled) in order for this
 	 * app to work properly.
-	 * 
+	 *
 	 * @var array
 	 */
 	private $extensions = array(
 		array('name' => 'fileinfo', 'type' => 'extension', 'expected' => true),
-		array('name' => 'mbstring', 'type' => 'extension', 'expected' => true),
+		array('name' => 'mbstring', 'type' => 'extension', 'expected' => false),
 		array('name' => 'pdo', 'type' => 'extension', 'expected' => true),
 		array('name' => 'pdo_mysql', 'type' => 'extension', 'expected' => true),
-		array('name' => 'gd', 'type' => 'extension', 'expected' => true),
+		array('name' => 'gd', 'type' => 'extension', 'expected' => false),
 		array('name' => 'Mcrypt', 'type' => 'extension', 'expected' => true),
 		array('name' => 'mysql_real_escape_string', 'type' => 'extension', 'expected' => false),
 		array('name' => 'curl', 'type' => 'extension', 'expected' => true),
@@ -27,14 +27,14 @@ class Installer {
 
 	/**
 	 * Directories that need to be writable.
-	 * 
+	 *
 	 * @var array
 	 */
     private $dirs = array('/application', '/assets/avatars', '/assets/images/albums', '/assets/images/artists', '/application/storage', '/application/storage/app', '/application/storage/framework', '/application/storage/logs', '/assets/css/custom-stylesheets', '/application/resources/lang');
 
 	/**
 	 * Holds the compatability check results.
-	 * 
+	 *
 	 * @var array
 	 */
 	private $compatResults = array('problem' => false);
@@ -47,7 +47,7 @@ class Installer {
 
         $post = json_decode(file_get_contents('php://input'), true);
         $data = isset($post['data']) ? $post['data'] : array();
-        
+
         if ($post && array_key_exists('handler', $post)) {
             set_error_handler(function($severity, $message) {
                echo json_encode(array('status' => 'error', 'message'=> $message)); exit;
@@ -64,7 +64,7 @@ class Installer {
 
 	/**
 	 * Check for any issues with the server.
-	 * 
+	 *
 	 * @return JSON
 	 */
 	public function checkForIssues()
@@ -78,7 +78,7 @@ class Installer {
 
 	/**
 	 * Check if we've got required php version.
-	 * 
+	 *
 	 * @return integer
 	 */
 	public function checkPhpVersion()
@@ -88,7 +88,7 @@ class Installer {
 
 	/**
 	 * Check if required folders are writable.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function checkFolders()
@@ -105,15 +105,15 @@ class Installer {
 
 		 	if ( ! $this->compatResults['problem']) {
 		 		$this->compatResults['problem'] = $writable ? false : true;
-		 	}		 	
+		 	}
 		}
-		
+
 		return $checked;
 	}
 
 	/**
 	 * Check for any issues with php extensions.
-	 * 
+	 *
 	 * @return array
 	 */
 	private function checkExtensions()
@@ -145,7 +145,7 @@ class Installer {
 
 	/**
 	 * Store admin account and basic details in db.
-	 * 
+	 *
 	 * @param  array  $input
 	 * @return void
 	 */
@@ -172,7 +172,7 @@ class Installer {
 
 	/**
 	 * Insert db credentials if needed, create schema and seed the database.
-	 * 
+	 *
 	 * @param  array  $input
 	 * @return array
 	 */
@@ -189,7 +189,7 @@ class Installer {
         $this->prepareDatabaseForMigration($input);
 
         //$this->generateAppKey();
-       
+
         try {
             Artisan::call('migrate:install');
         } catch (Exception $e) {}
@@ -269,7 +269,7 @@ class Installer {
 
 	/**
 	 * Insert user supplied db credentials into .env file.
-	 * 
+	 *
 	 * @param  array   $input
 	 * @return void
 	 */
@@ -394,13 +394,13 @@ class Installer {
 
                 if ($response === 404 || $response === 500) {
                     $this->htaccessEnableMultiViews();
-                    return (array('status' => 'error', 'message' => 'htacces error'));          
+                    return (array('status' => 'error', 'message' => 'htacces error'));
                 }
-            
+
             }
         }
 
-        return (array('status' => 'success', 'message' => 'success'));  
+        return (array('status' => 'success', 'message' => 'success'));
     }
 
     private function htaccessDisableMultiViews()
